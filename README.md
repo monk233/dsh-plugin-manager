@@ -28,30 +28,54 @@ plugin-manager/
 
 前置:先停止动态版插件(若之前运行过 `pmgr-*`),避免同一设置页重复注册。
 
-```bash
-# 1) 把本包加入 web profile 的依赖(转发给 pnpm)
-dsh plugin --profile web add <本目录绝对路径>
+### 0) 准备 `dsh` 与 `pnpm` 命令(新装环境需要)
 
-# 2) 确认组合行存在;若 dsh plugin add 未自动挂载,手动追加到
-#    $DSH_HOME/profiles/web/cordis.patch.yml:
-#    - insert:
-#        - id: plugin-manager
-#          name: '@dsh-external/dsh-plugin-manager'
+`dsh plugin` 命令只是把参数转发给 `pnpm`,两者都需要在 PATH 上:
+
+```bash
+# 全局安装 dsh(建议与运行版本一致,如 0.1.0-rc.6)与 pnpm
+npm install -g @deepseek-ai/dsh@0.1.0-rc.6 pnpm
+# 若 npm 提示 allow-scripts(原生模块 node-pty/koffi 等被拦),按提示放行后重装:
+npm install -g --allow-scripts=@deepseek-ai/dsh-subprocess-local,koffi,node-pty,@google/genai,protobufjs @deepseek-ai/dsh@0.1.0-rc.6
+# 新开一个终端验证(全局安装只对新终端生效):
+dsh --version && pnpm --version
 ```
 
-组合变化会触发 HMR 热重载(或重启 `dsh web`)。安装完成后打开 **设置 → 插件管理**。
+### 1) 方式 A:官方命令安装(推荐)
 
-### 手动安装(环境无 pnpm 时)
+```bash
+dsh plugin --profile web add <本目录绝对路径>
+```
 
-直接把本目录拷贝到 profile 的依赖区(与既有 `@dsh-external/*` 皮肤插件同一位置),再在 `$DSH_HOME/profiles/web/cordis.patch.yml` 追加组合行:
+`dsh plugin add` 只负责把包装进 profile 依赖(`pnpm add`),**不会**自动写入组合行 —— 确认 `$DSH_HOME/profiles/web/cordis.patch.yml` 里有该行,没有就追加:
+
+```yaml
+- insert:
+    - id: plugin-manager
+      name: '@dsh-external/dsh-plugin-manager'
+```
+
+### 2) 方式 B:手动拷贝(无 pnpm / 不想装依赖时)
+
+与既有 `@dsh-external/*` 皮肤插件同一位置直接拷贝,再追加组合行:
 
 ```powershell
 Copy-Item -Recurse <plugin-manager 绝对路径> "$env:DSH_HOME\profiles\node_modules\@dsh-external\dsh-plugin-manager"
-# 然后编辑 cordis.patch.yml 追加:
+# 然后编辑 $env:DSH_HOME\profiles\web\cordis.patch.yml 追加:
 # - insert:
 #     - id: plugin-manager
 #       name: '@dsh-external/dsh-plugin-manager'
 ```
+
+### 3) 重启 DSH(必做)
+
+**安装或修改代码后必须重启 DSH 进程。** loader 对模块 URL 有 ESM 缓存,组合热重载不会重新导入已改动的插件代码 —— 只刷新页面不会生效。重启后:
+
+- Host 以全新进程加载(注册 HTTP 路由 `/dsh-plugin-manager-api`);
+- 客户端模块由启动时的全量扫描**确定性**进入页面清单;
+- 打开 **设置 → 插件管理** 即可使用。
+
+> 排障:页面提示 "HTTP 405" / 接口 404 基本就是没重启(旧进程还在,可查 `Get-NetTCPConnection -LocalPort 3080` 的进程启动时间)。
 
 ## 使用
 
