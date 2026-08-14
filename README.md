@@ -9,15 +9,17 @@
 - 修改写入当前 profile 的用户补丁层 `$DSH_HOME/profiles/<profile>/cordis.patch.yml`,由 DSH 的 HMR 热重载自动生效 —— **无需手改配置文件、无需重启**;
 - 受保护的核心组件(include / loader / group / hmr / timer)不可切换;内置(bundle 层)插件只能禁用,不能删除。
 
-> 本包是从动态插件固化的**静态安装版**。动态插件(`harness.handle`)仅存在于当前进程、重启即失;静态版通过 Typert Remote 服务(`pluginManager`)与浏览器端通信,安装后**重启依然生效**。
+> 本包是从动态插件固化的**静态安装版**。动态插件(`harness.handle`)仅存在于当前进程、重启即失;静态版在 Host 端注册一条 HTTP JSON 路由(`/dsh-plugin-manager-api`),浏览器端直接 `fetch` 调用,安装后**重启依然生效**。
+>
+> 说明:不使用 Typert Remote 通道 —— 客户端的 `ctx.remote` 命名空间是编译进 web 前端 bundle 的固定集合(`dsh-api-remotes` 在构建期聚合各包的 `/remote` 导出),运行时安装的插件无法加入。
 
 ## 结构
 
 ```
 plugin-manager/
 ├── package.json          # dsh.client 声明 + exports(./client)
-├── lib/index.js          # Host: Typert Remote 服务(pluginManager)
-├── lib/client.js         # Browser: 设置页 + shell.overlay 下拉菜单
+├── lib/index.js          # Host: HTTP JSON API 路由(/dsh-plugin-manager-api)
+├── lib/client.js         # Browser: 设置页 + shell.overlay 下拉菜单(fetch 调用)
 ├── cordis.patch.yml      # bundle 补丁(插入自身组合行)
 └── README.md
 ```
@@ -59,8 +61,8 @@ Copy-Item -Recurse <plugin-manager 绝对路径> "$env:DSH_HOME\profiles\node_mo
 
 ## 开发
 
-- Host 端逻辑在 `lib/index.js`(补丁读写、保护名单、删除语义);
-- Browser 端在 `lib/client.js`(React,`ctx.remote.pluginManager.*` 调用);
+- Host 端逻辑在 `lib/index.js`(补丁读写、保护名单、删除语义、HTTP 路由);
+- Browser 端在 `lib/client.js`(React,`fetch('/dsh-plugin-manager-api')` 调用);
 - 修改后重新安装依赖即可(本包无构建步骤,浏览器端直接以 ModuleLoader 格式加载)。
 
 ## License
