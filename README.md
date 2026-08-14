@@ -31,9 +31,13 @@ dsh plugin --profile web add .
 
 > 安装这个插件 https://github.com/monk233/dsh-plugin-manager.git
 
-## 卸载
+## 禁用
 
-插件自带卸载功能:在 **设置 → 插件管理** 里对该行点 **⋮ → 删除** 即从组合中卸载.
+禁用dsh-plugin-manager后只能手动在配置文件中修改重启启用, 或者在dsh中让AI修改
+
+## 删除
+
+在dsh中让AI删除dsh-plugin-manager
 
 ## License
 
