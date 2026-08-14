@@ -39,6 +39,18 @@ dsh plugin --profile web add <本目录绝对路径>
 
 组合变化会触发 HMR 热重载(或重启 `dsh web`)。安装完成后打开 **设置 → 插件管理**。
 
+### 手动安装(环境无 pnpm 时)
+
+直接把本目录拷贝到 profile 的依赖区(与既有 `@dsh-external/*` 皮肤插件同一位置),再在 `$DSH_HOME/profiles/web/cordis.patch.yml` 追加组合行:
+
+```powershell
+Copy-Item -Recurse <plugin-manager 绝对路径> "$env:DSH_HOME\profiles\node_modules\@dsh-external\dsh-plugin-manager"
+# 然后编辑 cordis.patch.yml 追加:
+# - insert:
+#     - id: plugin-manager
+#       name: '@dsh-external/dsh-plugin-manager'
+```
+
 ## 使用
 
 - 搜索插件名或 id 快速过滤;
