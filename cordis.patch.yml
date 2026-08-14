@@ -1,0 +1,4 @@
+# plugin-manager bundle patch: inserts its public entry into the web profile roster.
+- insert:
+    - id: plugin-manager
+      name: '@dsh-external/dsh-plugin-manager'
