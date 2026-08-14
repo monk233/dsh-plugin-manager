@@ -1,5 +1,7 @@
 # dsh-plugin-manager
 
+[Changelogs](Changelogs.md)
+
 在 DeepSeek Harness **Web UI** 里直接管理 profile 插件:启用 / 禁用 / 删除组合行,自动热重载生效,不用手改配置文件。
 
 <img width="1215" height="1210" alt="image" src="https://github.com/user-attachments/assets/fa7d29cd-58a7-4d8d-856d-985a64b726c0" />
