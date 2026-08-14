@@ -16,24 +16,17 @@ npm install -g @deepseek-ai/dsh pnpm
 
 # 3) 安装到 web profile
 dsh plugin --profile web add .
-
-# 4) 在 $DSH_HOME/profiles/web/cordis.patch.yml 末尾追加组合行:
-#    - insert:
-#        - id: plugin-manager
-#          name: '@dsh-external/dsh-plugin-manager'
-
-# 5) 重启 DSH
 ```
 
 ### 方案二:让 AI 安装
 
 把本仓库路径(或 URL)给任意 AI 助手,说一句:
 
-> 按这个仓库 README 的安装步骤,把 dsh-plugin-manager 装进我的 web profile。
+> 安装这个插件 https://github.com/monk233/dsh-plugin-manager.git
 
 ## 卸载
 
-插件自带卸载功能:在 **设置 → 插件管理** 里对该行点 **⋮ → 删除** 即从组合中卸载,源码与已安装文件均保留。
+插件自带卸载功能:在 **设置 → 插件管理** 里对该行点 **⋮ → 删除** 即从组合中卸载.
 
 ## 使用
 
